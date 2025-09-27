@@ -1,0 +1,26 @@
+{% extends "html/base.html" %}
+{% block title %}Sedes - HomeCare{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+  <h1 class="mb-4">Sedes de Servicios de Salud</h1>
+  <table class="table table-striped table-bordered">
+    <thead class="table-dark">
+      <tr>
+        {% for col in data[0].keys() %}
+        <th>{{ col }}</th>
+        {% endfor %}
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in data %}
+      <tr>
+        {% for col in row.values() %}
+        <td>{{ col }}</td>
+        {% endfor %}
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}
