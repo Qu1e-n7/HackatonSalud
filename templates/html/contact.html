@@ -1,0 +1,59 @@
+{% extends "html/base.html" %}
+{% block title %}Health - HomeCare{% endblock %}
+{% block content %}
+   <form id="form-sintomas" class="mb-4" onsubmit="enviarSintomas(event)">
+      <div class="form-group">
+         <label for="nombre">Nombre:</label>
+         <input type="text" id="nombre" class="form-control" placeholder="Tu nombre">
+      </div>
+
+      <div class="form-group">
+         <label for="sintomas">Síntomas:</label>
+         <textarea id="sintomas" class="form-control" rows="4" placeholder="Describe tus síntomas"></textarea>
+      </div>
+
+      <button type="button" class="btn btn-primary" onclick="enviarSintomas()">Enviar</button>
+   </form>
+   <div id="respuesta" class="alert alert-info" style="display:none;"></div>
+
+   <div class="jornadas mt-5">
+      <h2 class="mb-3">Próximas Jornadas de Salud</h2>
+      <div id="lista-jornadas" class="list-group"></div>
+   </div>
+<script>
+   function enviarSintomas() {
+      const nombre = document.getElementById('nombre').value;
+      const sintomas = document.getElementById('sintomas').value;
+
+      fetch('/api/sintomas', {
+         method: 'POST',
+         headers: { 'Content-Type': 'application/json' },
+         body: JSON.stringify({ nombre, sintomas })
+      })
+         .then(response => response.text())
+         .then(data => {
+            const resp = document.getElementById('respuesta');
+            resp.style.display = 'block';
+            resp.innerText = data;
+            document.getElementById('form-sintomas').reset();
+         });
+   }
+
+   function cargarJornadas() {
+      fetch('/api/jornadas')
+         .then(response => response.json())
+         .then(jornadas => {
+            const contenedor = document.getElementById('lista-jornadas');
+            contenedor.innerHTML = '';
+            jornadas.forEach(j => {
+               const div = document.createElement('div');
+               div.className = 'list-group-item';
+               div.innerHTML = `<strong>${j.tipo}</strong><br>${j.lugar} - ${j.fecha}`;
+               contenedor.appendChild(div);
+            });
+         });
+   }
+
+   cargarJornadas();
+</script>
+{% endblock %}
