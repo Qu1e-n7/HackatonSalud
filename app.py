@@ -1,6 +1,8 @@
 from flask import Flask, render_template, request, jsonify
 import sqlite3, os
-import salud
+import datas
+import pandas as pd
+
 
 app = Flask(__name__)
 
@@ -27,13 +29,18 @@ def init_db():
 init_db()
 
 # --- Páginas ---
+
+
 @app.route('/')
 def index():
     return render_template('html/index.html')
 
 @app.route('/health')
 def health():
-    return render_template('html/health.html')
+    df = pd.read_csv("data/sedes_geocodificadas.csv")
+    df = df.dropna(subset=["Latitud", "Longitud"])
+    sedes = df.to_dict(orient="records")
+    return render_template('html/health.html', sedes=sedes)
 
 @app.route('/medicine')
 def medicine():
@@ -53,8 +60,14 @@ def contact():
 
 @app.route("/sedes")
 def sedes():
-    data = salud.dataframePrestadoresSedes()
-    return render_template("sedes.html", data=data)
+    # ejemplo: leer DataFrame de sedes con coordenadas
+    df = pd.DataFrame([
+        {"MunicipioSedeDesc": "Tunja", "NombrePrestador": "Hospital X", "Latitud": 5.54, "Longitud": -73.36},
+        {"MunicipioSedeDesc": "Duitama", "NombrePrestador": "Clínica Y", "Latitud": 5.82, "Longitud": -73.03},
+    ])
+    data = df.to_dict(orient="records")
+    return render_template("sedes.html", sedes=data)
+
 # --- API ---
 @app.route('/api/sintomas', methods=['POST'])
 def registrar_sintomas():
