@@ -2,25 +2,26 @@
 {% block title %}Sedes - HomeCare{% endblock %}
 
 {% block content %}
-<div class="container mt-5">
-  <h1 class="mb-4">Sedes de Servicios de Salud</h1>
-  <table class="table table-striped table-bordered">
-    <thead class="table-dark">
-      <tr>
-        {% for col in data[0].keys() %}
-        <th>{{ col }}</th>
-        {% endfor %}
-      </tr>
-    </thead>
-    <tbody>
-      {% for row in data %}
-      <tr>
-        {% for col in row.values() %}
-        <td>{{ col }}</td>
-        {% endfor %}
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
-</div>
+<h2 class="mb-3">Mapa de Sedes de Salud en Boyacá</h2>
+<div id="map" style="height:500px; border-radius:12px;"></div>
+
+<!-- Leaflet -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+<script>
+  var map = L.map('map').setView([5.5, -73.5], 8); // centro Boyacá
+
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap contributors'
+  }).addTo(map);
+
+  var sedes = {{ sedes | tojson }};
+  sedes.forEach(function(s){
+      if(s.Latitud && s.Longitud){
+          L.marker([s.Latitud, s.Longitud]).addTo(map)
+            .bindPopup(`<b>${s.MunicipioSedeDesc}</b><br>${s.NombrePrestador}`);
+      }
+  });
+</script>
 {% endblock %}
